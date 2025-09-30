@@ -27,17 +27,30 @@ device_addr_hash: dict[str, Device] = {}
 
 
 def read_config() -> Config:
+    """
+    Read the HA add-on options.json (or fallback config.json) and wrap in 'options'
+    to be compatible with the original elan2mqtt code.
+    """
+    import logging
+    from config import Config
+
+    logger = logging.getLogger(__name__)
     logger.info("loading config file")
+
     try:
-        config = Config("/data/options.json")
-        # pokud není key 'options', obalíme config.data
+        # HA add-on path
+        config_path = "/data/options.json"
+
+        config = Config(config_path)
+
+        # pokud options chybí (HA add-on), obalíme celý dict do 'options'
         if "options" not in config.data:
             config.data = {"options": config.data}
+
         return config
     except BaseException as be:
         logger.error("read config exception occurred", exc_info=True)
         raise
-
 
 def get_devices():
     """
