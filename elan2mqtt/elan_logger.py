@@ -6,8 +6,11 @@ from config import Config
 
 
 def set_logger(config: Config):
-    formatter = config.get("logging", {}).get("formatter", "%(asctime)s %(levelname)s - %(message)s")
-    log_level = config["logging"]["log_level"]
+    # bezpečný přístup k logging sekci
+    logging_config = config.data.get("logging", {}) if hasattr(config, "data") else {}
+
+    formatter = logging_config.get("formatter", "%(asctime)s %(levelname)s - %(message)s")
+    log_level = logging_config.get("log_level", "info").upper()
 
     old_factory = logging.getLogRecordFactory()
 
@@ -21,7 +24,10 @@ def set_logger(config: Config):
         return record
 
     logging.setLogRecordFactory(record_factory)
+
     numeric_level = getattr(logging, log_level.upper(), None)
     if not isinstance(numeric_level, int):
-        numeric_level = 30
+        numeric_level = logging.INFO
+
     logging.basicConfig(level=numeric_level, format=formatter)
+    logging.debug("Logger initialized")
