@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from logging import LogRecord
-
 from config import Config
 
 
@@ -9,8 +8,10 @@ def set_logger(config: Config):
     # bezpečný přístup k logging sekci
     logging_config = config.data.get("logging", {}) if hasattr(config, "data") else {}
 
-    formatter = logging_config.get("formatter", "%(asctime)s %(levelname)s - %(message)s")
-    log_level = logging_config.get("log_level", "info").upper()
+    formatter_str = logging_config.get("formatter", "%(asctime)s %(levelname)s - %(message)s")
+    log_level_str = logging_config.get("log_level", "info").upper()
+
+    formatter = logging.Formatter(formatter_str)
 
     old_factory = logging.getLogRecordFactory()
 
@@ -25,9 +26,18 @@ def set_logger(config: Config):
 
     logging.setLogRecordFactory(record_factory)
 
-    numeric_level = getattr(logging, log_level.upper(), None)
+    numeric_level = getattr(logging, log_level_str, logging.INFO)
     if not isinstance(numeric_level, int):
         numeric_level = logging.INFO
 
-    logging.basicConfig(level=numeric_level, format=formatter)
-    logging.debug("Logger initialized")
+    # odstraníme existující handlery, aby se nepřekrývaly
+    logger = logging.getLogger()
+    while logger.handlers:
+        logger.handlers.pop()
+
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    logger.setLevel(numeric_level)
+    logger.debug("Logger initialized")
