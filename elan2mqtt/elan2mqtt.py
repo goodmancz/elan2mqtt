@@ -27,17 +27,15 @@ device_addr_hash: dict[str, Device] = {}
 
 
 def read_config() -> Config:
-    """
-    read the common config file into a dict
-    """
     logger.info("loading config file")
-
     try:
         config = Config("/data/options.json")
+        # pokud není key 'options', obalíme config.data
+        if "options" not in config.data:
+            config.data = {"options": config.data}
         return config
     except BaseException as be:
-        logger.error("read config exception occurred")
-        logger.error(be, exc_info=True)
+        logger.error("read config exception occurred", exc_info=True)
         raise
 
 
