@@ -49,8 +49,8 @@ def read_config() -> "Config":
         options = config.data["options"]
 
         # fallback hodnoty pro chybějící klíče
-        options.setdefault("mqtt_user", "")
-        options.setdefault("mqtt_pass", "")
+        options.setdefault("mqtt_user", "admin")
+        options.setdefault("mqtt_pass", "elkoep")
         options.setdefault("disable_autodiscovery", False)
         options.setdefault("mqtt_id", "elan")
         options.setdefault("publish_interval", 300)
