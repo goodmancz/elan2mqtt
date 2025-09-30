@@ -5,8 +5,7 @@ from config import Config
 
 
 def set_logger(config: Config):
-    # bezpečný přístup k logging sekci
-    logging_config = config.data.get("logging", {}) if hasattr(config, "data") else {}
+    logging_config = getattr(config, "data", {}).get("logging", {})
 
     formatter_str = logging_config.get("formatter", "%(asctime)s %(levelname)s - %(message)s")
     log_level_str = logging_config.get("log_level", "info").upper()
