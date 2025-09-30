@@ -33,7 +33,7 @@ def read_config() -> Config:
     logger.info("loading config file")
 
     try:
-        config = Config("config.json")
+        config = Config("/data/options.json")
         return config
     except BaseException as be:
         logger.error("read config exception occurred")
