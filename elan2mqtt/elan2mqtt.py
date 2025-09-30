@@ -57,7 +57,7 @@ def read_config() -> "Config":
         options.setdefault("discover_interval", 600)
         options.setdefault("socket_interval", 0)
         options.setdefault("eLanURL", "http://192.168.1.99")
-        options.setdefault("MQTTserver", "127.0.0.1")
+        options.setdefault("MQTTserver", "192.168.171.207")
         options.setdefault("username", "admin")
         options.setdefault("password", "elkoep")
         options.setdefault("log_level", "info")
