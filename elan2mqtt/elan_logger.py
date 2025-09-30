@@ -6,7 +6,7 @@ from config import Config
 
 
 def set_logger(config: Config):
-    formatter = config["logging"]["formatter"]
+    formatter = config.get("logging", {}).get("formatter", "%(asctime)s %(levelname)s - %(message)s")
     log_level = config["logging"]["log_level"]
 
     old_factory = logging.getLogRecordFactory()
