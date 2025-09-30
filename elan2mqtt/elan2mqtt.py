@@ -26,10 +26,11 @@ device_hash: dict[str, Device] = {}
 device_addr_hash: dict[str, Device] = {}
 
 
-def read_config() -> Config:
+def read_config() -> "Config":
     """
-    Read the HA add-on options.json (or fallback config.json) and wrap in 'options'
-    to be compatible with the original elan2mqtt code.
+    Read HA add-on options.json (or fallback config.json) and wrap in 'options'
+    to be compatible with original elan2mqtt code.
+    Missing keys are auto-filled with defaults.
     """
     import logging
     from config import Config
@@ -38,16 +39,38 @@ def read_config() -> Config:
     logger.info("loading config file")
 
     try:
-        # HA add-on path
         config_path = "/data/options.json"
-
         config = Config(config_path)
 
-        # pokud options chybí (HA add-on), obalíme celý dict do 'options'
+        # pokud options chybí, obalíme celý dict do 'options'
         if "options" not in config.data:
             config.data = {"options": config.data}
 
+        options = config.data["options"]
+
+        # fallback hodnoty pro chybějící klíče
+        options.setdefault("mqtt_user", "")
+        options.setdefault("mqtt_pass", "")
+        options.setdefault("disable_autodiscovery", False)
+        options.setdefault("mqtt_id", "elan")
+        options.setdefault("publish_interval", 300)
+        options.setdefault("discover_interval", 600)
+        options.setdefault("socket_interval", 0)
+        options.setdefault("eLanURL", "http://192.168.1.99")
+        options.setdefault("MQTTserver", "127.0.0.1")
+        options.setdefault("username", "admin")
+        options.setdefault("password", "elkoep")
+        options.setdefault("log_level", "info")
+
+        # logging fallback
+        config.data.setdefault("logging", {})
+        config.data["logging"].setdefault(
+            "formatter", "%(asctime)s %(levelname)s - %(message)s"
+        )
+        config.data["logging"].setdefault("log_level", "info")
+
         return config
+
     except BaseException as be:
         logger.error("read config exception occurred", exc_info=True)
         raise
